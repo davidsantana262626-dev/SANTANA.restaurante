@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Santana Restaurante POS</title>
+
+  <style>
+    :root{
+      --bg:#0b0f17;
+      --card:#121a28;
+      --card2:#0f1522;
+      --text:#eaf2ff;
+      --muted:#9fb0cc;
+      --green:#22c55e;
+      --red:#ef4444;
+      --yellow:#f59e0b;
+      --blue:#3b82f6;
+      --border:#22304a;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: linear-gradient(180deg, #070a10, #0b1220);
+      color:var(--text);
+    }
+    header{
+      padding:16px;
+      background: rgba(10,14,24,.9);
+      position: sticky;
+      top:0;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+    header h1{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+      letter-spacing:.5px;
+    }
+    header .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+
+    .container{
+      padding:16px;
+      display:grid;
+      gap:14px;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    @media(min-width:900px){
+      .grid{
+        grid-template-columns: 1.2fr .8fr;
+      }
+    }
+
+    .card{
+      background: rgba(18,26,40,.9);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      padding:14px;
+      box-shadow: var(--shadow);
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .btn{
+      border:none;
+      background: var(--card2);
+      color:var(--text);
+      padding:12px 14px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:700;
+      border:1px solid var(--border);
+      transition: .15s;
+    }
+    .btn:hover{transform: scale(1.02);}
+    .btn.green{background: rgba(34,197,94,.15); border-color: rgba(34,197,94,.35);}
+    .btn.red{background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.35);}
+    .btn.blue{background: rgba(59,130,246,.15); border-color: rgba(59,130,246,.35);}
+    .btn.yellow{background: rgba(245,158,11,.15); border-color: rgba(245,158,11,.35);}
+
+    input, select, textarea{
+      width:100%;
+      padding:12px 12px;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      background: #0a0f1b;
+      color:var(--text);
+      outline:none;
+    }
+
+    label{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+      display:block;
+    }
+
+    .title{
+      font-size:14px;
+      font-weight:900;
+      margin:0 0 10px 0;
+      color: #ffffff;
+      letter-spacing:.4px;
+    }
+
+    .menuGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media(min-width:650px){
+      .menuGrid{grid-template-columns: 1fr 1fr 1fr;}
+    }
+
+    .item{
+      background: rgba(10,15,27,.8);
+      border:1px solid var(--border);
+      border-radius: 16px;
+      padding:12px;
+      cursor:pointer;
+      transition:.15s;
+    }
+    .item:hover{transform: scale(1.02);}
+    .item .name{font-weight:900; font-size:13px;}
+    .item .price{color:var(--green); font-weight:800; margin-top:6px; font-size:12px;}
+    .item .cat{color:var(--muted); font-size:11px; margin-top:4px;}
+
+    .cartItem{
+      border:1px solid var(--border);
+      border-radius: 16px;
+      padding:12px;
+      margin-bottom:10px;
+      background: rgba(10,15,27,.7);
+    }
+    .cartItem .top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .cartItem .top strong{font-size:13px;}
+    .cartItem .top span{color:var(--green); font-weight:900;}
+    .cartItem .controls{
+      display:flex;
+      gap:8px;
+      margin-top:10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .qtyBtns{
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .qty{
+      font-weight:900;
+      padding:6px 12px;
+      border-radius: 12px;
+      border:1px solid var(--border);
+      background:#0a0f1b;
+      min-width:48px;
+      text-align:center;
+    }
+
+    .totals{
+      border-top:1px dashed var(--border);
+      margin-top:10px;
+      padding-top:10px;
+      font-size:13px;
+    }
+    .totals div{
+      display:flex;
+      justify-content:space-between;
+      margin:6px 0;
+      color: var(--muted);
+    }
+    .totals div strong{
+      color: var(--text);
+    }
+    .grand{
+      font-size:16px;
+      font-weight:1000;
+      color: var(--green);
+    }
+
+    .small{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .footerBtns{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .badge{
+      font-size:11px;
+      padding:4px 10px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      color:var(--muted);
+    }
+
+    .tickets{
+      max-height: 320px;
+      overflow:auto;
+    }
+
+    .ticket{
+      background: rgba(10,15,27,.75);
+      border:1px solid var(--border);
+      border-radius: 16px;
+      padding:12px;
+      margin-bottom:10px;
+    }
+    .ticket h3{
+      margin:0 0 8px 0;
+      font-size:13px;
+    }
+    .ticket .meta{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+    .ticket .money{
+      color:var(--green);
+      font-weight:1000;
+    }
+
+    .hidden{display:none;}
+  </style>
+</head>
+
+<body>
+<header>
+  <h1>🍽️ Santana Restaurante POS</h1>
+  <div class="sub">Villa Central #5 • Tel: 829-727-5873 • ITBIS separado</div>
+</header>
+
+<div class="container">
+
+  <div class="grid">
+
+    <div class="card">
+      <h2 class="title">📋 Menú / Carta</h2>
+
+      <div class="row">
+        <div style="flex:1">
+          <label>Buscar producto</label>
+          <input id="search" placeholder="Ej: pollo, arroz, jugo..." />
+        </div>
+        <div style="width:200px">
+          <label>Categoría</label>
+          <select id="catFilter">
+            <option value="all">Todas</option>
+            <option value="Platos">Platos</option>
+            <option value="Bebidas">Bebidas</option>
+            <option value="Postres">Postres</option>
+            <option value="Extras">Extras</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" class="menuGrid" id="menuGrid"></div>
+
+      <div style="margin-top:14px" class="row">
+        <span class="badge">💾 Guarda pedidos automático</span>
+        <span class="badge">⚡ Rápido y sin trabarse</span>
+        <span class="badge">📱 Funciona en celular</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="title">🧾 Pedido Actual</h2>
+
+      <div class="row">
+        <div style="flex:1">
+          <label>Tipo de pedido</label>
+          <select id="tipoPedido">
+            <option value="Mesa">Mesa</option>
+            <option value="Para llevar">Para llevar</option>
+            <option value="Delivery">Delivery</option>
+          </select>
+        </div>
+        <div style="width:150px">
+          <label>Mesa #</label>
+          <input id="mesa" placeholder="Ej: 5" />
+        </div>
+      </div>
+
+      <div style="margin-top:10px">
+        <label>Nombre del cliente</label>
+        <input id="cliente" placeholder="Ej: Juan, María..." />
+      </div>
+
+      <div style="margin-top:10px">
+        <label>Dirección (si es delivery)</label>
+        <input id="direccion" placeholder="Ej: Villa Central #5..." />
+      </div>
+
+      <div style="margin-top:10px">
+        <label>Nota del pedido</label>
+        <textarea id="nota" rows="2" placeholder="Ej: sin cebolla, bien cocido..."></textarea>
+      </div>
+
+      <div style="margin-top:12px">
+        <label>Delivery (RD$)</label>
+        <input id="deliveryFee" type="number" value="0" />
+      </div>
+
+      <div style="margin-top:14px" id="cart"></div>
+
+      <div class="totals">
+        <div><span>Subtotal</span><strong id="subtotal">RD$ 0</strong></div>
+        <div><span>ITBIS (18%)</span><strong id="itbis">RD$ 0</strong></div>
+        <div><span>Delivery</span><strong id="deliveryTotal">RD$ 0</strong></div>
+        <div class="grand"><span>Total</span><span id="total">RD$ 0</span></div>
+      </div>
+
+      <div class="footerBtns">
+        <button class="btn yellow" onclick="guardarPedido()">💾 Guardar Pedido</button>
+        <button class="btn green" onclick="finalizarVenta()">✅ Finalizar Venta</button>
+        <button class="btn blue" onclick="imprimirTicket()">🖨️ Imprimir Ticket</button>
+        <button class="btn red" onclick="limpiarPedido()">🗑️ Limpiar</button>
+      </div>
+
+      <div class="small" style="margin-top:10px">
+        📌 Nota: Para imprimir por Bluetooth necesitas impresora compatible con navegador (o app puente).  
+        Este sistema genera el ticket listo para imprimir.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <h2 class="title">📊 Historial de Ventas</h2>
+    <div class="row">
+      <button class="btn blue" onclick="exportar()">⬇️ Exportar Ventas</button>
+      <button class="btn red" onclick="borrarVentas()">🧨 Borrar historial</button>
+      <div class="badge">Ventas guardadas: <span id="ventasCount">0</span></div>
+    </div>
+
+    <div style="margin-top:12px" class="tickets" id="tickets"></div>
+  </div>
+
+</div>
+
+<script>
+  // ===== CONFIG =====
+  const ITBIS_RATE = 0.18;
+
+  // ===== MENU DATA =====
+  const menu = [
+    {id:1, name:"Pollo Guisado", price:250, cat:"Platos"},
+    {id:2, name:"Pollo Frito", price:280, cat:"Platos"},
+    {id:3, name:"Chicharrón", price:320, cat:"Platos"},
+    {id:4, name:"Arroz Blanco", price:80, cat:"Extras"},
+    {id:5, name:"Habichuelas", price:90, cat:"Extras"},
+    {id:6, name:"Ensalada Verde", price:100, cat:"Extras"},
+    {id:7, name:"Papas Fritas", price:150, cat:"Extras"},
+    {id:8, name:"Moro de Guandules", price:120, cat:"Platos"},
+    {id:9, name:"Jugo Natural", price:120, cat:"Bebidas"},
+    {id:10, name:"Refresco", price:80, cat:"Bebidas"},
+    {id:11, name:"Agua", price:50, cat:"Bebidas"},
+    {id:12, name:"Flan", price:120, cat:"Postres"},
+    {id:13, name:"Tres Leches", price:180, cat:"Postres"},
+    {id:14, name:"Empanada", price:90, cat:"Extras"},
+    {id:15, name:"Sancocho (Plato)", price:350, cat:"Platos"},
+  ];
+
+  // ===== STATE =====
+  let cart = JSON.parse(localStorage.getItem("santana_cart")) || [];
+  let ventas = JSON.parse(localStorage.getItem("santana_ventas")) || [];
+
+  function money(n){
+    return "RD$ " + Number(n).toLocaleString("es-DO");
+  }
+
+  function saveCart(){
+    localStorage.setItem("santana_cart", JSON.stringify(cart));
+  }
+
+  function renderMenu(){
+    const search = document.getElementById("search").value.toLowerCase();
+    const cat = document.getElementById("catFilter").value;
+
+    const grid = document.getElementById("menuGrid");
+    grid.innerHTML = "";
+
+    const filtered = menu.filter(item=>{
+      const okSearch = item.name.toLowerCase().includes(search);
+      const okCat = (cat==="all") ? true : item.cat===cat;
+      return okSearch && okCat;
+    });
+
+    filtered.forEach(item=>{
+      const div = document.createElement("div");
+      div.className="item";
+      div.innerHTML = `
+        <div class="name">${item.name}</div>
+        <div class="cat">${item.cat}</div>
+        <div class="price">${money(item.price)}</div>
+      `;
+      div.onclick = ()=>addToCart(item.id);
+      grid.appendChild(div);
+    });
+  }
+
+  function addToCart(id){
+    const found = cart.find(x=>x.id===id);
+    if(found){
+      found.qty += 1;
+    }else{
+      const prod = menu.find(x=>x.id===id);
+      cart.push({id:prod.id, name:prod.name, price:prod.price, qty:1});
+    }
+    saveCart();
+    renderCart();
+  }
+
+  function changeQty(id, delta){
+    const found = cart.find(x=>x.id===id);
+    if(!found) return;
+    found.qty += delta;
+    if(found.qty <= 0){
+      cart = cart.filter(x=>x.id!==id);
+    }
+    saveCart();
+    renderCart();
+  }
+
+  function removeItem(id){
+    cart = cart.filter(x=>x.id!==id);
+    saveCart();
+    renderCart();
+  }
+
+  function calcSubtotal(){
+    return cart.reduce((sum,i)=> sum + (i.price*i.qty), 0);
+  }
+
+  function calcItbis(subtotal){
+    return Math.round(subtotal * ITBIS_RATE);
+  }
+
+  function calcDelivery(){
+    const fee = Number(document.getElementById("deliveryFee").value || 0);
+    return fee;
+  }
+
+  function renderCart(){
+    const cartDiv = document.getElementById("cart");
+    cartDiv.innerHTML = "";
+
+    if(cart.length===0){
+      cartDiv.innerHTML = `<div class="small">No hay productos en el pedido.</div>`;
+    }else{
+      cart.forEach(item=>{
+        const div = document.createElement("div");
+        div.className="cartItem";
+        div.innerHTML = `
+          <div class="top">
+            <strong>${item.name}</strong>
+            <span>${money(item.price*item.qty)}</span>
+          </div>
+          <div class="controls">
+            <div class="qtyBtns">
+              <button class="btn red" onclick="changeQty(${item.id},-1)">-</button>
+              <div class="qty">${item.qty}</div>
+              <button class="btn green" onclick="changeQty(${item.id},1)">+</button>
+            </div>
+            <button class="btn" onclick="removeItem(${item.id})">❌</button>
+          </div>
+        `;
+        cartDiv.appendChild(div);
+      });
+    }
+
+    const subtotal = calcSubtotal();
+    const itbis = calcItbis(subtotal);
+    const delivery = calcDelivery();
+    const total = subtotal + itbis + delivery;
+
+    document.getElementById("subtotal").innerText = money(subtotal);
+    document.getElementById("itbis").innerText = money(itbis);
+    document.getElementById("deliveryTotal").innerText = money(delivery);
+    document.getElementById("total").innerText = money(total);
+
+    renderTickets();
+  }
+
+  function limpiarPedido(){
+    if(!confirm("¿Seguro que quieres limpiar el pedido?")) return;
+    cart = [];
+    saveCart();
+    renderCart();
+  }
+
+  function generarTicketTexto(){
+    const tipo = document.getElementById("tipoPedido").value;
+    const mesa = document.getElementById("mesa").value.trim();
+    const cliente = document.getElementById("cliente").value.trim();
+    const direccion = document.getElementById("direccion").value.trim();
+    const nota = document.getElementById("nota").value.trim();
+    const deliveryFee = calcDelivery();
+
+    const subtotal = calcSubtotal();
+    const itbis = calcItbis(subtotal);
+    const total = subtotal + itbis + deliveryFee;
+
+    let text = "";
+    text += "SANTANA RESTAURANTE\n";
+    text += "Villa Central #5\n";
+    text += "Tel: 829-727-5873\n";
+    text += "----------------------------\n";
+    text += "Tipo: " + tipo + "\n";
+    if(mesa) text += "Mesa: " + mesa + "\n";
+    if(cliente) text += "Cliente: " + cliente + "\n";
+    if(direccion) text += "Direccion: " + direccion + "\n";
+    if(nota) text += "Nota: " + nota + "\n";
+    text += "----------------------------\n";
+
+    cart.forEach(i=>{
+      text += `${i.qty} x ${i.name}  ${money(i.price*i.qty)}\n`;
+    });
+
+    text += "----------------------------\n";
+    text += "Subtotal: " + money(subtotal) + "\n";
+    text += "ITBIS 18%: " + money(itbis) + "\n";
+    text += "Delivery: " + money(deliveryFee) + "\n";
+    text += "TOTAL: " + money(total) + "\n";
+    text += "----------------------------\n";
+    text += "Gracias por su compra!\n";
+    text += "Vuelva pronto.\n";
+
+    return text;
+  }
+
+  function imprimirTicket(){
+    if(cart.length===0){
+      alert("No hay productos para imprimir.");
+      return;
+    }
+    const ticket = generarTicketTexto();
+    const win = window.open("", "_blank");
+    win.document.write("<pre style='font-size:16px;font-family:monospace;white-space:pre-wrap;'>" + ticket + "</pre>");
+    win.document.close();
+    win.print();
+  }
+
+  function guardarPedido(){
+    if(cart.length===0){
+      alert("No puedes guardar un pedido vacío.");
+      return;
+    }
+
+    const tipo = document.getElementById("tipoPedido").value;
+    const mesa = document.getElementById("mesa").value.trim();
+    const cliente = document.getElementById("cliente").value.trim();
+    const direccion = document.getElementById("direccion").value.trim();
+    const nota = document.getElementById("nota").value.trim();
+    const deliveryFee = calcDelivery();
+
+    const subtotal = calcSubtotal();
+    const itbis = calcItbis(subtotal);
+    const total = subtotal + itbis + deliveryFee;
+
+    const venta = {
+      id: Date.now(),
+      fecha: new Date().toLocaleString("es-DO"),
+      tipo, mesa, cliente, direccion, nota,
+      items: JSON.parse(JSON.stringify(cart)),
+      subtotal, itbis, deliveryFee, total
+    };
+
+    ventas.unshift(venta);
+    localStorage.setItem("santana_ventas", JSON.stringify(ventas));
+
+    alert("Pedido guardado correctamente ✅");
+    renderTickets();
+  }
+
+  function finalizarVenta(){
+    guardarPedido();
+    cart = [];
+    saveCart();
+    renderCart();
+  }
+
+  function renderTickets(){
+    document.getElementById("ventasCount").innerText = ventas.length;
+
+    const cont = document.getElementById("tickets");
+    cont.innerHTML = "";
+
+    if(ventas.length===0){
+      cont.innerHTML = `<div class="small">Aún no hay ventas guardadas.</div>`;
+      return;
+    }
+
+    ventas.slice(0, 20).forEach(v=>{
+      const div = document.createElement("div");
+      div.className = "ticket";
+      div.innerHTML = `
+        <h3>🧾 Venta #${v.id}</h3>
+        <div class="meta">${v.fecha} • ${v.tipo} ${v.mesa ? ("• Mesa " + v.mesa) : ""}</div>
+        <div class="meta">Cliente: ${v.cliente || "N/A"}</div>
+        <div class="meta">Total: <span class="money">${money(v.total)}</span></div>
+        <button class="btn blue" onclick="verTicket(${v.id})">👁️ Ver Ticket</button>
+      `;
+      cont.appendChild(div);
+    });
+  }
+
+  function verTicket(id){
+    const v = ventas.find(x=>x.id===id);
+    if(!v) return;
+
+    let text = "";
+    text += "SANTANA RESTAURANTE\n";
+    text += "Villa Central #5\n";
+    text += "Tel: 829-727-5873\n";
+    text += "----------------------------\n";
+    text += "Fecha: " + v.fecha + "\n";
+    text += "Tipo: " + v.tipo + "\n";
+    if(v.mesa) text += "Mesa: " + v.mesa + "\n";
+    if(v.cliente) text += "Cliente: " + v.cliente + "\n";
+    if(v.direccion) text += "Direccion: " + v.direccion + "\n";
+    if(v.nota) text += "Nota: " + v.nota + "\n";
+    text += "----------------------------\n";
+
+    v.items.forEach(i=>{
+      text += `${i.qty} x ${i.name}  ${money(i.price*i.qty)}\n`;
+    });
+
+    text += "----------------------------\n";
+    text += "Subtotal: " + money(v.subtotal) + "\n";
+    text += "ITBIS 18%: " + money(v.itbis) + "\n";
+    text += "Delivery: " + money(v.deliveryFee) + "\n";
+    text += "TOTAL: " + money(v.total) + "\n";
+    text += "----------------------------\n";
+    text += "Gracias por su compra!\n";
+    text += "Vuelva pronto.\n";
+
+    alert(text);
+  }
+
+  function exportar(){
+    if(ventas.length===0){
+      alert("No hay ventas para exportar.");
+      return;
+    }
+
+    const data = {
+      negocio: "Santana Restaurante",
+      direccion: "Villa Central #5",
+      telefono: "829-727-5873",
+      ventas: ventas
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ventas_santana_restaurante.json";
+    a.click();
+
+    URL.revokeObjectURL(url);
+  }
+
+  function borrarVentas(){
+    if(!confirm("¿Seguro que quieres borrar TODAS las ventas?")) return;
+    ventas = [];
+    localStorage.setItem("santana_ventas", JSON.stringify(ventas));
+    renderTickets();
+  }
+
+  // ===== EVENTS =====
+  document.getElementById("search").addEventListener("input", renderMenu);
+  document.getElementById("catFilter").addEventListener("change", renderMenu);
+  document.getElementById("deliveryFee").addEventListener("input", renderCart);
+
+  // ===== INIT =====
+  renderMenu();
+  renderCart();
+  renderTickets();
+</script>
+
+</body>
+</html>
